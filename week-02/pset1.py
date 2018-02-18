@@ -46,9 +46,58 @@ sentence_words_alph = sorted(sentence_words, key = lambda x: x.lower())
 print(sentence_words_alph)
 
 #C Random function
-'''instructions = "Welcome to the random number generator. Please choose "
 from random import randint
+greetings = "Welcome to the random integer generator!"
+print(greetings)
+upper = int(input("Enter an upper bound integer: "))
+lower = int(input("Enter a lower bound integer, or hit enter for 0: ") or "0")
 # this returns random integer: 100 <= number <= 1000
-num = randint(100, 1000)
+num = randint(lower, upper)
+print(num)
+'''not sure what's up with the assert function
+assert(lower <= num <= upper)'''
 
-lower = input('Please input the lower bound: ')
+#D Sting Formatting function
+title = str(input("Please input bestseller title")).title()
+print(title)
+n = int(input("Please input bestseller's rank"))
+sentence = f'The number {n} bestseller today is {title}'
+print(sentence)
+
+#E Password validation function
+#thank you Zhubarb on stackexchange for your code
+
+import re
+password = str(input("Input a password to test: "))
+uc = re.search(r"[A-Z]", password)
+print(uc)
+if uc = True
+
+
+
+def hasnumbers(password):
+    ''' Check whether the input string is a digit. '''
+    try:
+        int(s)
+        return True
+    except:
+        # do not catch error
+        return False
+def check_validity(pw):
+    ''' Return True if input pw is valid, and return False if invalid.'''
+    special_chars = ['$','#','@']
+    if isinstance(pw,str): pw=list(pw) # I could have appointed to a diff var name
+    else: warnings.warn('Password has to be a string object.')
+    res = False
+    valid_dict={'small_let':False, 'num':False, 'special_chars':False,
+                'cap_let':False, 'len':False } # is using a dict efficient?
+    if len(pw)>= 6: valid_dict['len']=True
+    for i in pw:
+        if i.islower(): valid_dict['small_let'] = True
+        if i in special_chars: valid_dict['special_chars'] = True
+        if i.isupper(): valid_dict['cap_let'] = True
+        if not valid_dict['num']:  valid_dict['num'] = check_number(i)
+    if all(valid_dict.values()): res = True
+    return res
+
+print(check_validity(password))
