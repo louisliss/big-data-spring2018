@@ -65,39 +65,93 @@ sentence = f'The number {n} bestseller today is {title}'
 print(sentence)
 
 #E Password validation function
-#thank you Zhubarb on stackexchange for your code
+# adapted from https://codereview.stackexchange.com/questions/135634/password-validator-using-regular-expressions/135663
 
-import re
 password = str(input("Input a password to test: "))
-uc = re.search(r"[A-Z]", password)
-print(uc)
-if uc = True
 
-
-
-def hasnumbers(password):
-    ''' Check whether the input string is a digit. '''
-    try:
-        int(s)
-        return True
-    except:
-        # do not catch error
+def checklength(password):
+    if 8 > len(password) or 14 < len(password)  :
         return False
-def check_validity(pw):
-    ''' Return True if input pw is valid, and return False if invalid.'''
-    special_chars = ['$','#','@']
-    if isinstance(pw,str): pw=list(pw) # I could have appointed to a diff var name
-    else: warnings.warn('Password has to be a string object.')
-    res = False
-    valid_dict={'small_let':False, 'num':False, 'special_chars':False,
-                'cap_let':False, 'len':False } # is using a dict efficient?
-    if len(pw)>= 6: valid_dict['len']=True
-    for i in pw:
-        if i.islower(): valid_dict['small_let'] = True
-        if i in special_chars: valid_dict['special_chars'] = True
-        if i.isupper(): valid_dict['cap_let'] = True
-        if not valid_dict['num']:  valid_dict['num'] = check_number(i)
-    if all(valid_dict.values()): res = True
-    return res
+    else:
+        return True
 
-print(check_validity(password))
+def checkdigits(password):
+    if sum(c.isdigit() for c in password) < 2 :
+        return False
+    else:
+        return True
+
+def checkuppercase(password):
+    if sum(c.isupper() for c in password) < 1 :
+        return False
+    else:
+        return True
+
+def checkspecial(password):
+    special = ['!', '?', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=']
+    if any(c in password for c in special) :
+        return True
+    else:
+        return False
+
+def validate(password):
+    if checklength(password) is False :
+        return "Password must be between 8 and 14 characters"
+    elif checkdigits(password) is False :
+        return "Password must have at least one digit"
+    elif checkuppercase(password) is False :
+        return "Password must have at least one uppercase letter"
+    elif checkspecial(password) is False :
+        return "Password must have at least one special character !?@#$%^&*()-_+="
+    else:
+        return "Password is valid!"
+
+print(validate(password))
+
+#F Exponentiation function
+# Malik Brahimi you're a champ https://stackoverflow.com/questions/30414784/recursive-power-function-step
+
+
+a = int(input("What number would you like to exponentiate? "))
+n = int(input("To which power would you like to raise your number? "))
+
+def exponentiate (a,n):
+    if n == 0 :
+        return 1
+    elif n == 1:
+        return a
+    else:
+        return a * exponentiate(a, n-1)
+
+print(exponentiate(a,n))
+
+#G.1 Min function
+
+l = input("Type in list of positive numbers separated by a space: ")
+numbers = list(map(int, l.split( )))
+numbers.sort()
+
+def minim(numbers):
+    for x in numbers:
+        if x > x+1 :
+            return x+1
+        else:
+            return x
+
+print(minim(numbers))
+
+#G.2 Max function
+
+
+l = input("Type in list of positive numbers separated by a space: ")
+numbers = list(map(int, l.split( )))
+numbers.sort(reverse = True)
+
+def maxim(numbers):
+    for x in numbers:
+        if x < x+1 :
+            return x
+        else:
+            return x+1
+
+print(maxim(numbers))
