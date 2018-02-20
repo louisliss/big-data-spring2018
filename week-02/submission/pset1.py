@@ -127,7 +127,7 @@ print(exponentiate(a,n))
 
 #G.1 Min function
 
-l = input("Type in list of positive numbers separated by a space: ")
+l = input("Type in a list of numbers separated by a space: ")
 numbers = list(map(int, l.split( )))
 numbers.sort()
 
@@ -143,7 +143,7 @@ print(minim(numbers))
 #G.2 Max function
 
 
-l = input("Type in list of positive numbers separated by a space: ")
+l = input("Type in a list of numbers separated by a space: ")
 numbers = list(map(int, l.split( )))
 numbers.sort(reverse = True)
 
