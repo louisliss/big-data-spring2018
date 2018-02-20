@@ -47,15 +47,15 @@ print(sentence_words_alph)
 
 #C Random function
 from random import randint
-message = "Thank you for playing the random integer generator!"
-print(message)
-upper = int(input("Enter an upper bound integer: "))
-lower = int(input("Enter a lower bound integer, or hit enter for 0: ") or "0")
-# this returns random integer: 100 <= number <= 1000
-num = randint(lower, upper)
-print(num)
-'''not sure what's up with the assert function
-assert(lower <= num <= upper)'''
+
+def rfunc(upper, lower = 0):
+    upper = int(input("Enter an upper bound integer: "))
+    lower = int(input("Enter a lower bound integer, or hit enter for 0: ") or "0")
+    return randint(lower,upper)
+
+print(rfunc(lower,upper))
+
+assert(100 <= rfunc(100,1000) <= 1000)
 
 #D Sting Formatting function
 title = str(input("Please input bestseller title")).title()
