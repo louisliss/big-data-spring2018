@@ -47,8 +47,8 @@ print(sentence_words_alph)
 
 #C Random function
 from random import randint
-greetings = "Welcome to the random integer generator!"
-print(greetings)
+message = "Thank you for playing the random integer generator!"
+print(message)
 upper = int(input("Enter an upper bound integer: "))
 lower = int(input("Enter a lower bound integer, or hit enter for 0: ") or "0")
 # this returns random integer: 100 <= number <= 1000
