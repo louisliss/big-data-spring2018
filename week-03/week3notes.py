@@ -85,11 +85,44 @@ df[df['date_new'] == '2017-07-02']['weekday']
 df['weekday'] = df['date_new'].apply(lambda x: x.weekday()+1)
 df['weekday'].replace(7, 0, inplace = True)
 
+df2 = df.groupby('hour')['count'].describe()
+max = df2['count'].max()
+min = df2['count'].min()
+print(df2[df2['count'] == max])
+print(df2[df2['count'] == min])
+df2['count'].describe()
 
-'''for i in range(0, 168, 24):
-    j = range()
-    df.drop(df[df['weekday'] == (i/24) &
+#cleaning data
+
+import matplotlib
+%matplotlib inline
+
+day_hours = df[df['date'] == '2017-07-02'].groupby('hour')['count'].sum()
+day_hours.plot()
+
+df['date_new'] = pd.to_datetime(df['date'], format = '%Y-%m-%d')
+df['date_new'].head
+
+df['weekday'] = df['date_new'].apply(lambda x: x.weekday() + 1)
+df['weekday'].replace(7, 0, inplace = True)
+
+# df[df['date'] == '2017-07-10'].groupby('hour')['count'].sum()
+for i in range(0, 168, 24):
+  j = range(0,168,1)[i - 5]
+  if (j > i):
+    df.drop(df[
+    (df['weekday'] == (i/24)) &
     (
-    (df['hour'] < j | df ['hour'] > j + 18)
+    ( (df['hour'] < j) & (df['hour'] > i + 18) ) |
+    ( (df['hour'] > i + 18 ) & (df['hour'] < j) )
     )
-    ])''' 
+    ].index, inplace = True)
+  else:
+    df.drop(df[
+    (df['weekday'] == (i/24)) &
+    (
+    (df['hour'] < j) | (df['hour'] > i + 18 )
+    )
+    ].index, inplace = True)
+
+df.to_csv('data/skyhook_cleaned.csv')
