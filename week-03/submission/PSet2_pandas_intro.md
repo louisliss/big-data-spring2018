@@ -40,6 +40,7 @@ df['weekday'] = df['date_new'].apply(lambda x: x.weekday() + 1)
 df['weekday'].replace(7, 0, inplace = True)
 
 # Remove hour variables outside of the 24-hour window corresponding to the day of the week a given date lands on.
+
 for i in range(0, 168, 24):
   j = range(0,168,1)[i - 5]
   if (j > i):
@@ -66,6 +67,9 @@ Your first task is to create a bar chart (not a line chart!) of the total count 
 ### Solution
 
 ```python
+datecounts = df.groupby('date_new')['count'].sum()
+
+datecounts.plot.bar(title="Skyhook: Total Count by Date", color="blue")
 
 ```
 
@@ -78,6 +82,28 @@ After running your code, you should have either a new column in your DataFrame o
 ### Solution
 
 ```python
+newhours = []
+oldhours = list(df['hour'])
+
+len(oldhours)
+
+for i in df['hour']:
+  if i > 144:
+    df.replace(to_replace = i, value = i - 144)
+  elif i > 120:
+    newhours.append(i - 120)
+  elif i > 96:
+    newhours.append(i - 96)
+  elif i > 72:
+    newhours.append(i - 72)
+  elif i > 48:
+    newhours.append(i - 48)
+  elif i > 24:
+    newhours.append(i - 24)
+  elif i <= 24:
+    newhours.append(i)
+
+df.replace(to_replace=oldhours,value=newhours)
 
 ```
 
