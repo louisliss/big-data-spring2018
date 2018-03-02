@@ -21,6 +21,7 @@ While code performance and optimization won't count, all the code should be high
 You'll want to make sure that your data is prepared using the procedure we followed in class. The code is reproduced below; you should simply be able to run the code and reproduce the dataset with well-formatted datetime dates and no erroneous hour values.
 
 ```python
+
 import pandas as pd
 import numpy as np
 import matplotlib.pylab as plt
@@ -58,6 +59,7 @@ for i in range(0, 168, 24):
     (df['hour'] < j) | (df['hour'] > i + 18 )
     )
     ].index, inplace = True)
+
 ```
 
 ## Problem 1: Create a Bar Chart of Total Pings by Date
@@ -82,28 +84,52 @@ After running your code, you should have either a new column in your DataFrame o
 ### Solution
 
 ```python
-newhours = []
-oldhours = list(df['hour'])
 
-len(oldhours)
+#sets up lists to populate a dictionary
 
-for i in df['hour']:
-  if i > 144:
-    df.replace(to_replace = i, value = i - 144)
-  elif i > 120:
-    newhours.append(i - 120)
-  elif i > 96:
-    newhours.append(i - 96)
-  elif i > 72:
-    newhours.append(i - 72)
-  elif i > 48:
-    newhours.append(i - 48)
-  elif i > 24:
-    newhours.append(i - 24)
-  elif i <= 24:
-    newhours.append(i)
+from itertools import chain, repeat
+def ncycles(iterable, n):
+    return chain.from_iterable(repeat(tuple(iterable), n))
+existhours = list(sorted(df['hour'].unique()))
+day = list(range(0,24,1))
 
-df.replace(to_replace=oldhours,value=newhours)
+firstnight = list(range(19,24,1))
+dayloop = list(ncycles(day,6))
+lastday = list(range(0,19,1))
+assert len(existhours) == len(firstnight) + len(dayloop) + len(lastday)
+hourmap = firstnight + dayloop + lastday
+
+#makes a dictionary and optionally, an opportunity to check the work
+di = dict(zip(existhours,hourmap))
+print(di)
+
+print(lastday)
+print(existhours)
+
+
+
+#uses the dictionary to map the old range onto the new
+
+df['hour'].replace(di, inplace=True)
+
+#check the work
+
+df['hour'].nunique()
+print(df.groupby('hour')['count'].sum())
+
+df.count()
+
+#other loop method  
+for i in range(0,168,24):
+  j = range(0,168,1)[i-5]
+  if (j > i):
+    df['hour'].replace(range(i, i+19, 1), range(5, 24, 1), inplace = True)
+    df['hour'].replace(range(j, j+5, 1), range(0, 5, 1), inplace = True)
+  else:
+    df['hour'].replace(range(j, i+19, 1), range(0, 24, 1), inplace = True)
+
+#comparing
+
 
 ```
 
@@ -115,6 +141,9 @@ Now that you have both a date and a time (stored in a more familiar 24-hour rang
 
 ```python
 
+df['timestamp'] = pd.to_timedelta(df['hour'], unit ='h') + df['date_new']
+df['timestamp'].unique()
+
 ```
 
 ## Problem 4: Create Two Line Charts of Activity by Hour
@@ -125,6 +154,15 @@ Create two more graphs. The first should be a **line plot** of **total activity*
 
 ```python
 
+#First plot
+totact = df.groupby('timestamp')['count'].sum()
+totact.plot(kind='line', title='Counts by Time Series')
+
+#Second plot
+hoursum = df.groupby('hour')['count'].sum()
+hoursum.plot(kind='bar', title='Counts by Hour of the Day', color="red")
+
+
 ```
 
 ## Problem 5: Create a Scatter Plot of Shaded by Activity
@@ -132,8 +170,23 @@ Create two more graphs. The first should be a **line plot** of **total activity*
 Pick three times (or time ranges) and use the latitude and longitude to produce scatterplots of each. In each of these scatterplots, the size of the dot should correspond to the number of GPS pings. Find the [Scatterplot documentation here](http://pandas.pydata.org/pandas-docs/version/0.19.1/visualization.html#scatter-plot). You may also want to look into how to specify a pandas Timestamp (e.g., pd.Timestamp) so that you can write a mask that will filter your DataFrame appropriately. Start with the [Timestamp documentation](https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timestamps-vs-time-spans)!
 
 ```python
+julytwo.head()
+
+df['timestamp'].unique
+df['date_new'].unique
+df[]
+
+julytwo = df[(df['date_new'] == '2017-07-02' )]
+julynine = df[(df['date_new'] == '2017-07-09' )]
+julysxtn = df[(df['date_new'] == '2017-07-16')]
+
+julytwo.plot.scatter(x='lon', y='lat', s=julytwo['count']*(1/1000))
+julynine.plot.scatter(x='lon', y='lat', s=julynine['count']*(1/1000))
+julysxtn.plot.scatter(x='lon', y='lat', s=julysxtn['count']*(1/1000))
+
 
 ```
+
 
 ## Problem 6: Analyze Your (Very) Preliminary Findings
 
