@@ -69,8 +69,8 @@ Your first task is to create a bar chart (not a line chart!) of the total count 
 ### Solution
 
 ```python
-datecounts = df.groupby('date_new')['count'].sum()
 
+datecounts = df.groupby('date_new')['count'].sum()
 datecounts.plot.bar(title="Skyhook: Total Count by Date", color="blue")
 
 ```
@@ -101,12 +101,7 @@ hourmap = firstnight + dayloop + lastday
 
 #makes a dictionary and optionally, an opportunity to check the work
 di = dict(zip(existhours,hourmap))
-print(di)
-
-print(lastday)
-print(existhours)
-
-
+#print(di)
 
 #uses the dictionary to map the old range onto the new
 
@@ -117,18 +112,6 @@ df['hour'].replace(di, inplace=True)
 df['hour'].nunique()
 print(df.groupby('hour')['count'].sum())
 
-df.count()
-
-#other loop method  
-for i in range(0,168,24):
-  j = range(0,168,1)[i-5]
-  if (j > i):
-    df['hour'].replace(range(i, i+19, 1), range(5, 24, 1), inplace = True)
-    df['hour'].replace(range(j, j+5, 1), range(0, 5, 1), inplace = True)
-  else:
-    df['hour'].replace(range(j, i+19, 1), range(0, 24, 1), inplace = True)
-
-#comparing
 
 
 ```
@@ -170,19 +153,14 @@ hoursum.plot(kind='bar', title='Counts by Hour of the Day', color="red")
 Pick three times (or time ranges) and use the latitude and longitude to produce scatterplots of each. In each of these scatterplots, the size of the dot should correspond to the number of GPS pings. Find the [Scatterplot documentation here](http://pandas.pydata.org/pandas-docs/version/0.19.1/visualization.html#scatter-plot). You may also want to look into how to specify a pandas Timestamp (e.g., pd.Timestamp) so that you can write a mask that will filter your DataFrame appropriately. Start with the [Timestamp documentation](https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timestamps-vs-time-spans)!
 
 ```python
-julytwo.head()
 
-df['timestamp'].unique
-df['date_new'].unique
-df[]
+sunjuly16 = df[(df['date_new'] == '2017-07-16' )]
+wedjuly19 = df[(df['date_new'] == '2017-07-19' )]
+satjuly22 = df[(df['date_new'] == '2017-07-22')]
 
-julytwo = df[(df['date_new'] == '2017-07-02' )]
-julynine = df[(df['date_new'] == '2017-07-09' )]
-julysxtn = df[(df['date_new'] == '2017-07-16')]
-
-julytwo.plot.scatter(x='lon', y='lat', s=julytwo['count']*(1/1000))
-julynine.plot.scatter(x='lon', y='lat', s=julynine['count']*(1/1000))
-julysxtn.plot.scatter(x='lon', y='lat', s=julysxtn['count']*(1/1000))
+sunjuly16.plot.scatter(x='lon', y='lat', s=sunjuly16['count']*(1/100))
+wedjuly19.plot.scatter(x='lon', y='lat', s=wedjuly19['count']*(1/100))
+satjuly22.plot.scatter(x='lon', y='lat', s=satjuly22['count']*(1/100))
 
 
 ```
@@ -195,3 +173,7 @@ For three of the visualizations you produced above, write a one or two paragraph
 1. A phenomenon that the data make visible (for example, how location services are utilized over the course of a day and why this might by).
 2. A shortcoming in the completeness of the data that becomes obvious when it is visualized.
 3. How this data could help us identify vulnerabilities related to climate change in the greater Boston area.
+
+By counting location requests by devices by time and location, the Skyhook data gives an idea of where and when people are vigorously thumbing at their phones in apps that utilize location services. For example, it appears that location services utilization is very cyclical each day, which is illustrated in the time series line graph and the bar graph. Utilization seems to peak during the morning rush hour, with a secondary peak during the evening rush. By looking at the maps generating by plotting using latitute and longitude, we can see that Kendall Square lights up on a mid-week day (Wed the 19th) but is less active on weekend days, which is interesting. I might conjecture that this area fills up with people glued to their phones during weekdays. One data shortcoming is the fact that the last week of data appears to totally drop off. Unless everyone in Boston went on vacation that week, it's possible that the data is incomplete.
+
+In the metadata, it appears that the data can be aggregated by what type of app is requesting a location, and navigation apps are a category. This could help show where people are commuting, to the extent they use navigation apps. It could be useful to have this information for routes vulnerable to climate risks like I-93 and Morrissey Blvd in Dorchester, which can close during flooding. 
