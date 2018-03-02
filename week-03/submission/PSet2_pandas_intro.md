@@ -103,7 +103,7 @@ hourmap = firstnight + dayloop + lastday
 di = dict(zip(existhours,hourmap))
 #print(di)
 
-#uses the dictionary to map the old range onto the new
+#uses the dictionary to replace the old range with the new
 
 df['hour'].replace(di, inplace=True)
 
@@ -176,4 +176,4 @@ For three of the visualizations you produced above, write a one or two paragraph
 
 By counting location requests by devices by time and location, the Skyhook data gives an idea of where and when people are vigorously thumbing at their phones in apps that utilize location services. For example, it appears that location services utilization is very cyclical each day, which is illustrated in the time series line graph and the bar graph. Utilization seems to peak during the morning rush hour, with a secondary peak during the evening rush. By looking at the maps generating by plotting using latitute and longitude, we can see that Kendall Square lights up on a mid-week day (Wed the 19th) but is less active on weekend days, which is interesting. I might conjecture that this area fills up with people glued to their phones during weekdays. One data shortcoming is the fact that the last week of data appears to totally drop off. Unless everyone in Boston went on vacation that week, it's possible that the data is incomplete.
 
-In the metadata, it appears that the data can be aggregated by what type of app is requesting a location, and navigation apps are a category. This could help show where people are commuting, to the extent they use navigation apps. It could be useful to have this information for routes vulnerable to climate risks like I-93 and Morrissey Blvd in Dorchester, which can close during flooding. 
+In the metadata, it appears that the data can be aggregated by what type of app is requesting a location, and navigation apps are a category. This could help show where people are commuting, to the extent they use navigation apps. It could be useful to have this information for routes vulnerable to climate risks like I-93 and Morrissey Blvd in Dorchester, which can close during flooding.
