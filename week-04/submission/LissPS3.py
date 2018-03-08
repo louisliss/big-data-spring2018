@@ -1,9 +1,10 @@
+#scraper
 
 import jsonpickle
 import tweepy
 import pandas as pd
-# import os
-# os.chdir('week-04')
+import os
+os.chdir('week-04')
 from twitter_keys import api_key, api_secret
 
 auth = tweepy.AppAuthHandler(api_key, api_secret)
@@ -21,6 +22,23 @@ def auth(key, secret):
       return api
 
 api = auth(api_key, api_secret)
+
+
+def parse_tweet(tweet):
+  p = pd.Series()
+  if tweet.coordinates != None:
+    p['lat'] = tweet.coordinates['coordinates'][0]
+    p['lon'] = tweet.coordinates['coordinates'][1]
+  else:
+    p['lat'] = None
+    p['lon'] = None
+  p['location'] = tweet.user.location
+  p['id'] = tweet.id_str
+  p['content'] = tweet.text
+  p['user'] = tweet.user.screen_name
+  p['user_id'] = tweet.user.id_str
+  p['time'] = str(tweet.created_at)
+  return p
 
 def get_tweets(
     geo,
@@ -71,9 +89,6 @@ def get_tweets(
         break
       for tweet in new_tweets:
         all_tweets = all_tweets.append(parse_tweet(tweet), ignore_index = True)
-        if write == True:
-            with open(out_file, 'w') as f:
-                f.write(jsonpickle.encode(tweet._json, unpicklable=False) + '\n')
       max_id = new_tweets[-1].id
       tweet_count += len(new_tweets)
     except tweepy.TweepError as e:
@@ -81,25 +96,9 @@ def get_tweets(
       print("Error : " + str(e))
       break
   print (f"Downloaded {tweet_count} tweets.")
+  if write == True:
+       all_tweets.to_json(out_file)
   return all_tweets
-
-def parse_tweet(tweet):
-   p = pd.Series()
-   if tweet.coordinates != None:
-     p['lat'] = tweet.coordinates['coordinates'][0]
-     p['lon'] = tweet.coordinates['coordinates'][1]
-   else:
-     p['lat'] = None
-     p['lon'] = None
-   p['location'] = tweet.user.location
-   p['id'] = tweet.id_str
-   p['content'] = tweet.text
-   p['user'] = tweet.user.screen_name
-   p['user_id'] = tweet.user.id_str
-   p['time'] = str(tweet.created_at)
-   return p
-
-
 
 # Set a Lat Lon
 latlng = '42.359416,-71.093993' # Eric's office (ish)
@@ -121,8 +120,10 @@ tweets = get_tweets(
   out_file = file_name
 )
 
-tweets.to_json('C:/Users/Louis Liss/Desktop/github/big-data-spring2018/week-04/data/tweets.json')
-df = pd.read_json('data/tweets.json')
+
+
+#resetting the dataframe
+#df = pd.read_json('data/tweets.json')
 
 #Cleaning ze data
 #looking at the mess
@@ -148,7 +149,7 @@ df['location'].replace(medford_loc, 'Medford, MA', inplace = True)
 df['location'].replace(malden_loc, 'Malden, MA', inplace = True)
 df['location'].replace("",'No Location Reported', inplace = True)
 df['location'].replace(other_us, 'Other US', inplace = True)
-df['location'].replace(np.where(df['location'] not in toplocations,'Other'))
+#df['location'].replace(np.where(df['location'] not in toplocations,'Other'))
 
 
 #ugh
@@ -191,6 +192,49 @@ plt.show()
 
 #scatterplot situation
 
+import matplotlib as plt
+%matplotlib inline
+
 df.plot.scatter(x='lon', y='lat')
 
 #search terms
+#search for mit-related tweets
+
+mitmention = tweets[tweets['content'].str.contains('mit', case = False)]
+
+#work around for dataframe slice problem
+mitmention = pd.read_csv("C:/Users/Louis Liss/Desktop/github/big-data-spring2018/week-04/submission/mitmention.csv")
+
+
+#dropping Duplicates
+
+mitmention[mitmention.duplicated(subset = 'content', keep = False)]
+mitmention.drop_duplicates(subset = 'content', keep = False, inplace = True)
+
+#cleaning mit-related tweets
+
+boston_loc = mitmention[mitmention['location'].str.contains("Boston", case=False)]['location']
+cambridge_loc = mitmention[mitmention['location'].str.contains("Cambridge", case=False)]['location']
+somerville_loc = mitmention[mitmention['location'].str.contains("Somerville", case=False)]['location']
+medford_loc = mitmention[mitmention['location'].str.contains("Medford", case=False)]['location']
+malden_loc = mitmention[mitmention['location'].str.contains("Malden", case=False)]['location']
+other_us = mitmention[mitmention['location'].str.contains("USA", case=False) | mitmention['location'].str.contains("united states", case=False)]['location']
+
+#these don't work for the same reason as the duplicate dropping script above
+mitmention['location'].replace(boston_loc, 'Boston, MA', inplace = True)
+mitmention['location'].replace(cambridge_loc, 'Cambridge, MA', inplace = True)
+mitmention['location'].replace(somerville_loc, 'Somerville, MA', inplace = True)
+mitmention['location'].replace(medford_loc, 'Medford, MA', inplace = True)
+mitmention['location'].replace(malden_loc, 'Malden, MA', inplace = True)
+mitmention['location'].replace("",'No Location Reported', inplace = True)
+mitmention['location'].replace(other_us, 'Other US', inplace = True)
+
+#scatterplot part two
+
+
+mitmention.plot.scatter(x='lon', y='lat')
+
+#export
+
+df.to_csv("C:/Users/Louis Liss/Desktop/github/big-data-spring2018/week-04/submission/df.csv")
+mitmention.to_csv("C:/Users/Louis Liss/Desktop/github/big-data-spring2018/week-04/submission/mitmention.csv")
