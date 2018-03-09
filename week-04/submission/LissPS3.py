@@ -1,4 +1,4 @@
-#scraper
+##scraper
 
 import jsonpickle
 import tweepy
@@ -100,6 +100,8 @@ def get_tweets(
        all_tweets.to_json(out_file)
   return all_tweets
 
+##search 1: no search term
+
 # Set a Lat Lon
 latlng = '42.359416,-71.093993' # Eric's office (ish)
 # Set a search distance
@@ -112,7 +114,6 @@ file_name = 'data/tweets.json'
 # to get more than one
 t_max = 2000
 
-
 tweets = get_tweets(
   geo = geocode_query,
   tweet_max = t_max,
@@ -120,57 +121,40 @@ tweets = get_tweets(
   out_file = file_name
 )
 
-
-
 #resetting the dataframe
-#df = pd.read_json('data/tweets.json')
+#tweets = pd.read_json('data/tweets.json')
 
-#Cleaning ze data
-#looking at the mess
-locations = df['location'].value_counts().to_frame()
-toplocations = locations[locations['location'] >= 5]
-otherlocations = locations['location']<5
-print(otherlocations)
+##Cleaning the data
 
-print(toplocations)
+#Fixing locations
 
+boston_loc = tweets[tweets['location'].str.contains("Boston", case=False)]['location']
+tweets['location'].replace(boston_loc, 'Boston, MA', inplace = True)
 
-boston_loc = df[df['location'].str.contains("Boston", case=False)]['location']
-cambridge_loc = df[df['location'].str.contains("Cambridge", case=False)]['location']
-somerville_loc = df[df['location'].str.contains("Somerville", case=False)]['location']
-medford_loc = df[df['location'].str.contains("Medford", case=False)]['location']
-malden_loc = df[df['location'].str.contains("Malden", case=False)]['location']
-other_us = df[df['location'].str.contains("USA", case=False) | df['location'].str.contains("united states", case=False)]['location']
+cambridge_loc = tweets[tweets['location'].str.contains("Cambridge", case=False)]['location']
+tweets['location'].replace(cambridge_loc, 'Cambridge, MA', inplace = True)
 
-df['location'].replace(boston_loc, 'Boston, MA', inplace = True)
-df['location'].replace(cambridge_loc, 'Cambridge, MA', inplace = True)
-df['location'].replace(somerville_loc, 'Somerville, MA', inplace = True)
-df['location'].replace(medford_loc, 'Medford, MA', inplace = True)
-df['location'].replace(malden_loc, 'Malden, MA', inplace = True)
-df['location'].replace("",'No Location Reported', inplace = True)
-df['location'].replace(other_us, 'Other US', inplace = True)
-#df['location'].replace(np.where(df['location'] not in toplocations,'Other'))
+somerville_loc = tweets[tweets['location'].str.contains("Somerville", case=False)]['location']
+tweets['location'].replace(somerville_loc, 'Somerville, MA', inplace = True)
 
+medford_loc = tweets[tweets['location'].str.contains("Medford", case=False)]['location']
+tweets['location'].replace(medford_loc, 'Medford, MA', inplace = True)
 
-#ugh
-for i in df['location']:
-    if row not in toplocations:
-        df['location'].replace(i,"Other",inplace = True)
-    break
+otherlist = tweets[~tweets['location'].str.contains('Boston, MA|Cambridge, MA|Somerville, MA|Medford, MA')]['location']
+tweets['location'].replace(otherlist, 'Other Locations',inplace = True)
 
 #dropping Duplicates
 
-df[df.duplicated(subset = 'content', keep = False)]
-df.drop_duplicates(subset = 'content', keep = False, inplace = True)
+tweets[tweets.duplicated(subset = 'content', keep = False)]
+tweets.drop_duplicates(subset = 'content', keep = False, inplace = True)
 
 
+##location pie chart
 
+import matplotlib.pyplot as plt
+%matplotlib inline
 
-df['location'].value_counts()
-df['location'].nunique()
-
-#pie chart situation
-loc_tweets = df[df['location'] != '']
+loc_tweets = tweets[tweets['location'] != '']
 count_tweets = loc_tweets.groupby('location')['id'].count()
 df_count_tweets = count_tweets.to_frame()
 df_count_tweets
@@ -186,55 +170,98 @@ colors = ["#697dc6","#5faf4c","#7969de","#b5b246",
 
 plt.pie(df_count_tweets['count'], labels=df_count_tweets.index.get_values(), shadow=False, colors=colors)
 plt.axis('equal')
+plt.title('Breakdown of User-Provided Locations')
 plt.tight_layout()
 plt.show()
 
 
-#scatterplot situation
+##scatterplot
 
-import matplotlib as plt
-%matplotlib inline
+x = tweets['lon']
+y = tweets['lat']
 
-df.plot.scatter(x='lon', y='lat')
+plt.scatter(x, y)
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
 
-#search terms
-#search for mit-related tweets
+title = "Location of Geocoded Tweets near Building 9, MIT"
+subtitle = "Note: There was only a small subset of tweets with user-elected geocoding"
 
-mitmention = tweets[tweets['content'].str.contains('mit', case = False)]
+plt.suptitle(title, y=1.00, fontsize=18)
+plt.title(subtitle, fontsize=10)
+plt.show()
 
-#work around for dataframe slice problem
-mitmention = pd.read_csv("C:/Users/Louis Liss/Desktop/github/big-data-spring2018/week-04/submission/mitmention.csv")
+##search 2: using search term
 
+# Set a Lat Lon
+latlng = '42.359416,-71.093993' # Eric's office (ish)
+# Set a search distance
+radius = '5mi'
+# See tweepy API reference for format specifications
+geocode_query = latlng + ',' + radius
+# set output file location
+file_name = 'data/climtweets.json'
+# set threshold number of Tweets. Note that it's possible
+# to get more than one
+t_max = 2000
+search = "storm"
+
+climtweets = get_tweets(
+  geo = geocode_query,
+  search_term = search,
+  tweet_max = t_max,
+  write = True,
+  out_file = file_name
+)
+
+
+#resetting the dataframe
+climtweets = pd.read_json('data/climtweets.json')
+
+
+##Cleaning the data
+
+#Fixing locations
+
+boston_loc = climtweets[climtweets['location'].str.contains("Boston", case=False)]['location']
+climtweets['location'].replace(boston_loc, 'Boston, MA', inplace = True)
+
+cambridge_loc = climtweets[climtweets['location'].str.contains("Cambridge", case=False)]['location']
+climtweets['location'].replace(cambridge_loc, 'Cambridge, MA', inplace = True)
+
+somerville_loc = climtweets[climtweets['location'].str.contains("Somerville", case=False)]['location']
+climtweets['location'].replace(somerville_loc, 'Somerville, MA', inplace = True)
+
+medford_loc = climtweets[climtweets['location'].str.contains("Medford", case=False)]['location']
+climtweets['location'].replace(medford_loc, 'Medford, MA', inplace = True)
+
+otherlist = climtweets[~climtweets['location'].str.contains('Boston, MA|Cambridge, MA|Somerville, MA|Medford, MA')]['location']
+climtweets['location'].replace(otherlist, 'Other Locations',inplace = True)
 
 #dropping Duplicates
 
-mitmention[mitmention.duplicated(subset = 'content', keep = False)]
-mitmention.drop_duplicates(subset = 'content', keep = False, inplace = True)
+climtweets[climtweets.duplicated(subset = 'content', keep = False)]
+climtweets.drop_duplicates(subset = 'content', keep = False, inplace = True)
 
-#cleaning mit-related tweets
+##scatterplot part two
 
-boston_loc = mitmention[mitmention['location'].str.contains("Boston", case=False)]['location']
-cambridge_loc = mitmention[mitmention['location'].str.contains("Cambridge", case=False)]['location']
-somerville_loc = mitmention[mitmention['location'].str.contains("Somerville", case=False)]['location']
-medford_loc = mitmention[mitmention['location'].str.contains("Medford", case=False)]['location']
-malden_loc = mitmention[mitmention['location'].str.contains("Malden", case=False)]['location']
-other_us = mitmention[mitmention['location'].str.contains("USA", case=False) | mitmention['location'].str.contains("united states", case=False)]['location']
+x = tweets['lon']
+y = tweets['lat']
 
-#these don't work for the same reason as the duplicate dropping script above
-mitmention['location'].replace(boston_loc, 'Boston, MA', inplace = True)
-mitmention['location'].replace(cambridge_loc, 'Cambridge, MA', inplace = True)
-mitmention['location'].replace(somerville_loc, 'Somerville, MA', inplace = True)
-mitmention['location'].replace(medford_loc, 'Medford, MA', inplace = True)
-mitmention['location'].replace(malden_loc, 'Malden, MA', inplace = True)
-mitmention['location'].replace("",'No Location Reported', inplace = True)
-mitmention['location'].replace(other_us, 'Other US', inplace = True)
+plt.scatter(x, y)
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
 
-#scatterplot part two
+title = "Location of Geocoded Tweets Mentioning 'Storm' near Building 9, MIT"
+subtitle = "Note: There was only a small subset of tweets with user-elected geocoding"
+
+plt.suptitle(title, y=1.00, fontsize=18)
+plt.title(subtitle, fontsize=10)
+plt.show()
 
 
-mitmention.plot.scatter(x='lon', y='lat')
 
-#export
+##export
 
-df.to_csv("C:/Users/Louis Liss/Desktop/github/big-data-spring2018/week-04/submission/df.csv")
-mitmention.to_csv("C:/Users/Louis Liss/Desktop/github/big-data-spring2018/week-04/submission/mitmention.csv")
+tweets.to_csv("C:/Users/Louis Liss/Desktop/github/big-data-spring2018/week-04/submission/tweets.csv")
+climtweets.to_csv("C:/Users/Louis Liss/Desktop/github/big-data-spring2018/week-04/submission/climtweets.csv")
