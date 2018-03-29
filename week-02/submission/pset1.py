@@ -20,6 +20,16 @@ del list_one[len(list_one)-1]
 list_one.append('new')
 print(list_one)
 
+# EH: Works, but could also use reverse indexing like so...
+list_one[-1] = 'new'
+
+
+
+
+
+
+
+
 #B.1 Convert the list into a normal sentence with join(), then print.
 sentence_words = ['I', 'am', 'learning', 'Python', 'to', 'munge', 'large', 'datasets', 'and', 'visualize', 'them']
 s = " "
@@ -58,6 +68,9 @@ print(rfunc(lower,upper))
 assert(100 <= rfunc(100,1000) <= 1000)
 
 #D Sting Formatting function
+
+# EH: Not a function!
+
 title = str(input("Please input bestseller title")).title()
 print(title)
 n = int(input("Please input bestseller's rank"))
