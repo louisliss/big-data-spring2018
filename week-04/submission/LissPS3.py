@@ -176,6 +176,13 @@ plt.show()
 
 
 ##scatterplot
+'''grading note: bringing in csv to view scatterplot and look at cleaned data'''
+import numpy as np
+tweets = pd.read_csv('/Users/phoebe/Dropbox (MIT)/big-data/data/pset3_CSVs/Liss, Louis A/36794119-tweets.csv')
+tweets.head()
+np.shape(tweets)
+tweets['location'].unique()
+tweets['lon'].unique()
 
 x = tweets['lon']
 y = tweets['lat']
@@ -244,7 +251,13 @@ climtweets[climtweets.duplicated(subset = 'content', keep = False)]
 climtweets.drop_duplicates(subset = 'content', keep = False, inplace = True)
 
 ##scatterplot part two
+'''grading note: bringing in csv to view scatterplot and look at cleaned data'''
+tweets = pd.read_csv('/Users/phoebe/Dropbox (MIT)/big-data/data/pset3_CSVs/Liss, Louis A/36794115-climtweets.csv')
+tweets.head()
+np.shape(tweets)
+tweets['location'].unique()
 
+## looks like you plotted 'tweets' again instead of climtweets!
 x = tweets['lon']
 y = tweets['lat']
 
