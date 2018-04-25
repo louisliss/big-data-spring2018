@@ -32,6 +32,8 @@ import matplotlib.pylab as plt
 # Read in the data
 
 df = pd.read_csv('week-03/data/skyhook_2017-07.csv', sep=',')
+# read in for PH
+df = pd.read_csv('/Users/phoebe/Dropbox (MIT)/big-data/data/skyhook_2017-07.csv', sep=',')
 
 # Create a new date column formatted as datetimes.
 df['date_new'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
@@ -123,7 +125,6 @@ Now that you have both a date and a time (stored in a more familiar 24-hour rang
 ### Solution
 
 ```python
-
 df['timestamp'] = pd.to_timedelta(df['hour'], unit ='h') + df['date_new']
 df['timestamp'].unique()
 
