@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Mapping with D3</title>
+	<script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+	<script src="http://d3js.org/topojson.v1.min.js"></script>
+	<script src="https://d3js.org/d3-queue.v2.min.js"></script>
+	<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+</head>
+<body>
+
+
+	<!-- Page elements and content go here. -->
+	<script>
+
+	var width = 720,
+	    height = 600;
+
+	var projection = d3.geoAlbers()
+	    .scale(190000)
+			.rotate( [71.057,0] )
+			.center( [0, 42.313] )
+			.translate( [width/2,height/2] );
+	var path = d3.geoPath()
+	    .projection(projection);
+
+	var svg = d3.select("body").append("svg")
+	    .attr("width", width)
+	    .attr("height", height);
+
+	var color = d3.scaleThreshold()
+	    .domain([0.05, 0.10, 0.15, 0.20, 0.25])
+		  .range(["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#756bb1", "#54278f"]);
+
+  var tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("font-family", "'Open Sans', sans-serif")
+    .style("font-size", "12px")
+    // .style("z-index", "10")
+    .style("background-color",'#ffffff')
+    .style("opacity", 0.7)
+    .style("padding", "5px")
+    .style("visibility", "hidden");
+
+			// Queue up datasets using d3 Queue
+	d3.queue()
+	    .defer(d3.json, "data/boston_neigh.json")
+			.defer(d3.csv, "data/boston_311_totals.csv")
+	    .await(ready); // Run 'ready' when JSONs are loaded
+
+	function ready(error, boston, complaints) {
+  if (error) throw error;
+
+	var complaintsById = {}; // Create empty object for holding dataset
+  complaints.forEach(function(d) {
+    complaintsById[d.id] = +d.twit_count/d.tot_count * 100; // Create property for each ID, give it value from rate
+  });
+
+  // var twitComplaints = complaintsById.toFixed(2);
+
+	  svg.append("g")
+		   .attr("class", "boston_neigh")
+		   .selectAll("path")
+		   .data(topojson.feature(boston, boston.objects.boston_neigh).features) // Bind TopoJSON data elements
+		   .enter().append("path")
+		   .attr("d", path)
+			 .style("fill", function(d) {
+				 	return color(complaintsById[+d.properties.OBJECTID]); // get rate value for property matching data ID
+					// pass rate value to color function, return color based on domain and range
+				})
+      .on("mouseover", function(d){
+        return tooltip
+        .style("visibility", "visible")
+        .style("top", (d3.event.pageY-10)+"px")
+				.style("left", (d3.event.pageX+10)+"px")
+        .text(d.properties.Name + ": " + d.properties.OBJECTID + "%");
+      })
+      .on("mousemove", function(d){
+		      return tooltip
+          .style("top", (d3.event.pageY-10)+"px")
+          .style("left",(d3.event.pageX+10)+"px")
+          .text(d.properties.Name + ": " + d.properties.OBJECTID + "%");
+	   })
+      .on("mouseout", function(d){
+      		return tooltip
+          .style("visibility", "hidden")
+      ;});}
+
+					// Our D3 code will go here.
+	</script>
+</body>
+</html>
